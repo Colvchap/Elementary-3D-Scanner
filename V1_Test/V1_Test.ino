@@ -38,8 +38,10 @@ int AnalogInPin = 0;                 // analog pin used to connect the IR sensor
 int val = 0;                 // variable to store the values from sensor(initially zero)
 int buttonState = 0;
 int lastButtonState = 0;
+int lastButtonState2 = 0;
 unsigned long previousMillisButton = 0;       // store last time the button was checked to see if it was being pressed
-const int delayInterval = 300; //Set the delay time between button checks
+unsigned long previousMillisButton2 = 0;
+const int delayInterval = 500; //Set the delay time between button checks
 int count = 0;
 int buttonMode = 0;
 int ledState = HIGH;
@@ -98,13 +100,16 @@ void fullScan()
       delay(40);                       // waits 15ms for the servo to reach the position
       Serial.println(count);
       if (buttonMode == 0){
-        return;
+        break;
       }
     }
     tiltservo.write(tilt);              // tell servo to go to position in variable 'pos'
     panservo.write(PANMIN);
     readIn();
-    delay(50);                       // waits 15ms for the servo to reach the position
+    delay(50); // waits 15ms for the servo to reach the position
+    if (buttonMode == 0){
+        break;
+      }
   }
   count = 0;
   
@@ -132,6 +137,7 @@ void buttonUpdate() {
   }
   }
   else {
+    Serial.println("Test time!");
     for (int x = 0; x < 5; x ++){
       readIn();
       delay(100);
@@ -142,14 +148,16 @@ void buttonUpdate() {
 void buttonModeChange() {
   unsigned long currentMillis = millis();
   buttonState = digitalRead(modePin);
-  if ((currentMillis - previousMillisButton) >= delayInterval){
-    if (buttonState == HIGH && lastButtonState != HIGH) {
+  if ((currentMillis - previousMillisButton2) >= delayInterval){
+    if (buttonState == HIGH && lastButtonState2 != HIGH) {
       ledState = !ledState;
       digitalWrite(ledPin, ledState);
       buttonMode = (++buttonMode) % 2;
       count = 0;
       Serial.println("WE CHANGED!");
     }
+    lastButtonState2 = buttonState;
+    previousMillisButton2 = currentMillis;
   }
 }
 
