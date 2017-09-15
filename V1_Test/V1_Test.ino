@@ -28,6 +28,7 @@ const int panServoPin = 8;
 const int tiltServoPin = 9;
 const int analogInPin = 0; //Set the analogInPin
 const int analogOutPin = 7; // Analog output pin that the LED is attached to
+const int ledPin = 10;
 
 
 // variables
@@ -41,6 +42,7 @@ unsigned long previousMillisButton = 0;       // store last time the button was 
 const int delayInterval = 300; //Set the delay time between button checks
 int count = 0;
 int buttonMode = 0;
+int ledState = HIGH;
 
 
 void setup() {
@@ -48,16 +50,18 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(startPin), buttonUpdate, CHANGE);
 
   pinMode(modePin, INPUT);
-  attachInterrupt(digitalPinToInterrupt(startPin), buttonUpdate, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(modePin), buttonModeChange, CHANGE);
 
   pinMode(analogInPin, INPUT_PULLUP);
   pinMode(analogOutPin, OUTPUT);
+  pinMode(ledPin, OUTPUT);
 
   panservo.attach(panServoPin);  // attaches the pan servo on pin 8 to the servo object
   tiltservo.attach(tiltServoPin); // attaches the tilt servo on pin 9 to the servo object
 
   Serial.begin(9600);               // starts the serial monitor
   Serial.println("Val \ttilt \tpan");
+  digitalWrite(ledPin, ledState);
 }
 
 void loop() {
@@ -93,23 +97,24 @@ void fullScan()
       readIn();
       delay(40);                       // waits 15ms for the servo to reach the position
       Serial.println(count);
-      if (count >= 4){
-        Serial.println("Returned");
+      if (buttonMode == 0){
         return;
       }
     }
     tiltservo.write(tilt);              // tell servo to go to position in variable 'pos'
     panservo.write(PANMIN);
     readIn();
-    delay(30);                       // waits 15ms for the servo to reach the position
+    delay(50);                       // waits 15ms for the servo to reach the position
   }
-  
+  count = 0;
   
 }
 
 void buttonUpdate() {
   unsigned long currentMillis = millis();
   buttonState = digitalRead(startPin);
+  if (buttonMode == 1)
+  {
   if ((currentMillis - previousMillisButton) >= delayInterval){
     if (buttonState == HIGH && lastButtonState != HIGH) {
           fullScan();
@@ -124,6 +129,27 @@ void buttonUpdate() {
     }
     previousMillisButton = currentMillis;    
     lastButtonState = buttonState;
+  }
+  }
+  else {
+    for (int x = 0; x < 5; x ++){
+      readIn();
+      delay(100);
+    }
+  }
+}
+
+void buttonModeChange() {
+  unsigned long currentMillis = millis();
+  buttonState = digitalRead(modePin);
+  if ((currentMillis - previousMillisButton) >= delayInterval){
+    if (buttonState == HIGH && lastButtonState != HIGH) {
+      ledState = !ledState;
+      digitalWrite(ledPin, ledState);
+      buttonMode = (++buttonMode) % 2;
+      count = 0;
+      Serial.println("WE CHANGED!");
+    }
   }
 }
 
