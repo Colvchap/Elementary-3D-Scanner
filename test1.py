@@ -4,6 +4,7 @@
 ## requires pySerial to be installed
 import sys
 sys.path.insert(0, u'/…/…/…/python2.7/site-packages')
+import serial
 
 serial_port = '/dev/ttyACM0';
 baud_rate = 9600; #In arduino, Serial.begin(baud_rate)
