@@ -8,10 +8,10 @@ Servo tiltservo; // create servo object for tilting
 
 // Set constants
 const int INTERVAL = 500;   //set button interval
-const int TILTMIN = 45;     //Set min tilt angle
-const int TILTMAX = 135;    //Set max tilt angle
-const int PANMIN = 45;      //Set min pan angle
-const int PANMAX = 135;     //Set max pan angle
+const int TILTMIN = 60;     //Set min tilt angle
+const int TILTMAX = 120;    //Set max tilt angle
+const int PANMIN = 60;      //Set min pan angle
+const int PANMAX = 120;     //Set max pan angle
 const int STEP = 1;         //Set step for angle
 const double Pi = 3.14159;  //Pi.
 const double b = 6.5048;    //The constant b from the calibration done in MATLAB.
@@ -23,7 +23,6 @@ const int modePin = 2;      //The pin of the button that changes modes
 const int panServoPin = 8;  //The pin of the pan servo
 const int tiltServoPin = 9; //The pin of the tilt servo
 const int analogInPin = 0;  //Set the pin that the IR sensor will print to
-const int ledPin = 10;      //The pin of the LED
 
 
 
@@ -38,7 +37,6 @@ unsigned long previousMillisButton = 0;       // store last time the button was 
 unsigned long previousMillisButton2 = 0;      // Stores last time second button was checked
 const int delayInterval = 200; //Set the delay time between button checks
 int buttonMode = 0;           //Used to store which mode the project is in.
-int ledState = HIGH;          //Used to change the LED state if it isn't in testing mode.
 int corrval = 0;              //The corrected val value.
 
 
@@ -53,15 +51,13 @@ void setup() {
 
   //Attach misc. pins
   pinMode(analogInPin, INPUT_PULLUP);
-  pinMode(ledPin, OUTPUT);
 
   //Attach servos
   panservo.attach(panServoPin);  // attaches the pan servo on pin 8 to the servo object
   tiltservo.attach(tiltServoPin); // attaches the tilt servo on pin 9 to the servo object
 
   Serial.begin(9600);               // starts the serial monitor
-  Serial.println("Val \tcorval \ttilt \tpan \txval \tyval \tzval"); //Prints what the information will be in each column.
-  digitalWrite(ledPin, ledState);   //Write the starting LED state.
+  Serial.println("Val \tcorval \ttilt \tpan \txval \tyval \tzval"); //Prints what the information will be in each column
 }
 
 void loop() {
@@ -207,8 +203,6 @@ void buttonModeChange() {
   buttonState = digitalRead(modePin);
   if ((currentMillis - previousMillisButton2) >= delayInterval){
     if (buttonState == HIGH && lastButtonState2 != HIGH) {
-      ledState = !ledState;
-      digitalWrite(ledPin, ledState);
       buttonMode = (++buttonMode) % 3;
       Serial.println("WE CHANGED! to: ");
       Serial.println(buttonMode);
