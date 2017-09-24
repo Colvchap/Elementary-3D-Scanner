@@ -115,10 +115,12 @@ void fullScan()
   //Go from the minimums to maximums for hte two servos, pause, then take a reading.
   for (tilt = TILTMIN; tilt <= TILTMAX; tilt += STEP) {
     for (pan = PANMIN; pan <= PANMAX; pan += STEP) { 
-      panservo.write(pan);b
-      delay(25); 
-      readIn(); 
-      delay(5);
+      panservo.write(pan);
+      delay(50); 
+      for (int x = 1; x <= 5; x++){
+        readIn(); 
+        delay(5);
+      }
       //If the button mode changes, break out of this loop.
       if (buttonMode != 1){
         break;
@@ -129,7 +131,7 @@ void fullScan()
     panservo.write(PANMIN);
 
     //Make sure there's enough time for the servos to move to the position
-    delay(45); 
+    delay(500); 
 
     
     if (buttonMode == 0){
