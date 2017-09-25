@@ -57,7 +57,7 @@ void setup() {
   tiltservo.attach(tiltServoPin); // attaches the tilt servo on pin 9 to the servo object
 
   Serial.begin(9600);               // starts the serial monitor
-  Serial.println("Val \tcorval \ttilt \tpan \txval \tyval \tzval"); //Prints what the information will be in each column
+  Serial.println("Val \tcorval \ttilt \tpanl"); //Prints what the information will be in each column
 }
 
 void loop() {
@@ -88,12 +88,6 @@ void readIn()
   Serial.print(tilt);
   Serial.print("\t");
   Serial.print(pan);
-  Serial.print("\t");
-  Serial.print(xval);
-  Serial.print("\t");
-  Serial.print(yval);
-  Serial.print("\t");
-  Serial.print(zval);
   Serial.println("");
 }
 
@@ -146,9 +140,12 @@ void halfScan()
   interrupts();
   panservo.write(PANMIN);
   for (pan = PANMIN; pan <= PANMAX; pan += STEP) {
-    panservo.write(pan);              
-    readIn();
-    delay(40);                      
+    panservo.write(pan);    
+    delay(10);          
+    for (int x = 1; x <= 5; x++){
+        readIn(); 
+        delay(5);
+      }                      
     if (buttonMode == 0){
       break;
     }
