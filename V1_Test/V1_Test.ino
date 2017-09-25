@@ -24,8 +24,6 @@ const int panServoPin = 8;  //The pin of the pan servo
 const int tiltServoPin = 9; //The pin of the tilt servo
 const int analogInPin = 0;  //Set the pin that the IR sensor will print to
 
-
-
 // variables
 int pan = 0;                  // Stores the pan servo position
 int tilt = 0;                 // Stores the tilt servo position
@@ -60,10 +58,12 @@ void setup() {
   Serial.println("Val \tcorval \ttilt \tpanl"); //Prints what the information will be in each column
 }
 
+
 void loop() {
   interrupts();   //allow interrupts
   delay(10);
 }
+
 
 void readIn()
 {
@@ -71,14 +71,8 @@ void readIn()
   
   val = analogRead(analogInPin);       // reads the value of the sharp sensor
 
-  //Gets the corrected values for what will be printed
-  double cortilt = (tilt-90.0)/180.0*2.0*Pi;
-  double corpan = (pan-90.0)/180.0*2.0*Pi;
+  //Gets the corrected distance
   double cordist = (log(val)-b)/m;
-  int zval = (cordist*sin(cortilt));
-  double roe = cordist * cos(cortilt);
-  int xval = (roe*cos(corpan));
-  int yval = (roe*sin(corpan));
 
   //Print the data obtained from the read.
   Serial.print(val);
@@ -122,8 +116,6 @@ void fullScan()
 
     //Make sure there's enough time for the servos to move to the position
     delay(500); 
-
-    
     if (buttonMode == 0){
         break;
       }
@@ -133,6 +125,7 @@ void fullScan()
   panservo.write((PANMIN + PANMAX)/2);
   tiltservo.write((TILTMIN + TILTMAX/2));
 }
+
 
 void halfScan()
 {
@@ -153,22 +146,25 @@ void halfScan()
   panservo.write(PANMIN);
 }
 
+
 void buttonUpdate() 
 {
   //The function that activates the correct sequence of events, depending on what the button mode is.
   unsigned long currentMillis = millis();
   buttonState = digitalRead(startPin);
+  
   //Option 1: Do a full scan
   if (buttonMode == 1)
   {
-  if ((currentMillis - previousMillisButton) >= delayInterval){
-    if (buttonState == HIGH && lastButtonState != HIGH) {
-          fullScan();
-        } 
-    previousMillisButton = currentMillis;    
-    lastButtonState = buttonState;
+    if ((currentMillis - previousMillisButton) >= delayInterval){
+      if (buttonState == HIGH && lastButtonState != HIGH) {
+            fullScan();
+          } 
+      previousMillisButton = currentMillis;    
+      lastButtonState = buttonState;
+    }
   }
-  }
+  
   //Option 2: Do a half scan
   else if (buttonMode == 2){
     if ((currentMillis - previousMillisButton) >= delayInterval){
@@ -193,6 +189,7 @@ void buttonUpdate()
   lastButtonState = buttonState;
   }
 }
+
 
 void buttonModeChange() {
   //Change what mode the device is in.
